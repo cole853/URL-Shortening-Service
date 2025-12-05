@@ -1,0 +1,6 @@
+@URL_Shortening.Backend_HostAddress = http://localhost:5251
+
+GET http://localhost:5251/weatherforecast/
+Accept: application/json
+
+###
