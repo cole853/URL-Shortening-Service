@@ -6,6 +6,7 @@ namespace URL_Shortening_Service.Backend.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using URL_Shortening_Service.Backend.Data;
     using URL_Shortening_Service.Backend.Models;
 
     /// <summary>
@@ -13,26 +14,62 @@ namespace URL_Shortening_Service.Backend.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class ShortURLController(AppDbContext context)
+    public class ShortURLController
     : ControllerBase
     {
-        private readonly AppDbContext context = context;
+        private readonly IShortURLRepository shortURLRepo;
 
         /// <summary>
-        /// The function that is called when the endpoint /api/ShortUrl/GetShortURLs is accessed.
+        /// Initializes a new instance of the <see cref="ShortURLController"/> class.
         /// </summary>
-        /// <returns>returns the ok status with a list of shortURLs in the database.</returns>
-        [HttpGet("GetShortURLs")]
-        public async Task<IActionResult> GetShortURL()
+        /// <param name="shortURLRepository">The shortURLRepository that will be used to communicate with the database.</param>
+        public ShortURLController(IShortURLRepository shortURLRepository)
         {
-            var result = await this.context.ShortURLs.Select(x => new ShortURL
-            {
-                Id = x.Id,
-                Url = x.Url,
-                ShortCode = x.ShortCode,
-            }).ToListAsync();
+            this.shortURLRepo = shortURLRepository;
+        }
 
-            return this.Ok(result);
+        /// <summary>
+        /// The Post endpoint used to create a new shortened URL.
+        /// </summary>
+        /// <param name="shortURL">The shortURL to be added to the database.</param>
+        /// <returns>The new shortURL if successful and a status code.</returns>
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ShortURL shortURL)
+        {
+            return this.BadRequest("Test message");
+        }
+
+        /// <summary>
+        /// This Get endpoint is used to get the information from one shortcode.
+        /// </summary>
+        /// <param name="shortCode">The shortCode to return information for.</param>
+        /// <returns>The shortURL with the given shortCode if successful and a status code.</returns>
+        [HttpGet("{shortCode}")]
+        public async Task<IActionResult> Get(string shortCode)
+        {
+            return this.NotFound("Test message");
+        }
+
+        /// <summary>
+        /// The Put endpoint updates a shortURL.
+        /// </summary>
+        /// <param name="shortURL">The shortURL to be updated with its change.</param>
+        /// <returns>The updated shortURL if successful with a status code.</returns>
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] ShortURL shortURL)
+        {
+            return this.NotFound("Test message");
+        }
+
+        /// <summary>
+        /// The Delete endpoint deletes one of the shortURLs.
+        /// </summary>
+        /// <param name="shortCode">The shortCode to be deleted.</param>
+        /// <returns>A bool indicating whether the deletion was successful and a status code.</returns>
+        [HttpDelete("{shortCode}")]
+        public async Task<IActionResult> Delete(string shortCode)
+        {
+            return this.NotFound("Test message");
         }
     }
 }
