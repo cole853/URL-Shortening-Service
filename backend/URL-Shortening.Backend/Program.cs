@@ -4,7 +4,9 @@
 
 namespace URL_Shortening_Service.Backend
 {
+    using System.Security.Cryptography.X509Certificates;
     using Microsoft.EntityFrameworkCore;
+    using URL_Shortening_Service.Backend.Data;
     using URL_Shortening_Service.Backend.Models;
 
     /// <summary>
@@ -27,6 +29,8 @@ namespace URL_Shortening_Service.Backend
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IShortURLRepository, ShortURLRepository>();
 
             var app = builder.Build();
 

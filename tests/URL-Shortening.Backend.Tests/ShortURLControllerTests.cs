@@ -6,9 +6,13 @@ namespace URL_Shortening.Backend.Tests
 {
     using AutoFixture;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.VisualBasic;
     using Moq;
+    using NUnit.Framework.Constraints;
     using URL_Shortening_Service.Backend.Controllers;
     using URL_Shortening_Service.Backend.Data;
+    using URL_Shortening_Service.Backend.DTOs.Requests;
+    using URL_Shortening_Service.Backend.Exceptions;
     using URL_Shortening_Service.Backend.Models;
 
     /// <summary>
@@ -38,13 +42,13 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Post_ShortURL_ReturnOk()
         {
-            ShortURL url = this.fixture.Create<ShortURL>();
+            var url = this.fixture.Create<Task<ShortURL>>();
 
-            this.shortURLRepoMock.Setup(repo => repo.Post(It.IsAny<ShortURL>())).Returns(url);
+            this.shortURLRepoMock.Setup(repo => repo.Post(It.IsAny<CreateShortURLRequest>())).Returns(url);
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Post(url);
+            var result = await controller.Post(It.IsAny<CreateShortURLRequest>());
             var obj = result as ObjectResult;
 
             if (obj is null)
@@ -64,11 +68,11 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Post_ShortURL_ThrowException()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Post(It.IsAny<ShortURL>())).Throws(new Exception());
+            this.shortURLRepoMock.Setup(repo => repo.Post(It.IsAny<CreateShortURLRequest>())).Throws(new Exception());
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Post(It.IsAny<ShortURL>());
+            var result = await controller.Post(It.IsAny<CreateShortURLRequest>());
             var obj = result as ObjectResult;
 
             if (obj is null)
@@ -90,13 +94,14 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Get_ShortURL_ReturnOk()
         {
-            var url = this.fixture.Create<ShortURL>();
+            var url = this.fixture.Create<Task<ShortURL>>();
+            string testShortCode = "abcdefghij";
 
             this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Returns(url);
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Get(It.IsAny<string>());
+            var result = await controller.Get(testShortCode);
             var obj = result as ObjectResult;
 
             if (obj is null)
@@ -110,22 +115,48 @@ namespace URL_Shortening.Backend.Tests
         }
 
         /// <summary>
-        /// Tests whether Get returns 404 Not Found when it is unsuccessful.
+        /// Tests whether Get returns 400 Bad Request when it is unsuccessful.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Test]
         public async Task Get_ShortURL_ThrowException()
         {
             this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new Exception());
+            string testShortCode = "abcdefghij";
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Get(It.IsAny<string>());
+            var result = await controller.Get(testShortCode);
             var obj = result as ObjectResult;
 
             if (obj is null)
             {
                 Assert.Fail("obj was null in Get_ShortURL_ThrowException.");
+            }
+            else
+            {
+                Assert.That(obj.StatusCode, Is.EqualTo(400));
+            }
+        }
+
+        /// <summary>
+        /// Tests whether Get returns 404 Not Found when it is unsuccessful.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        [Test]
+        public async Task Get_ShortURL_ThrowNotFound()
+        {
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new NotFoundException("Test Message"));
+            string testShortCode = "abcdefghij";
+
+            ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
+
+            var result = await controller.Get(testShortCode);
+            var obj = result as ObjectResult;
+
+            if (obj is null)
+            {
+                Assert.Fail("obj was null in Get_ShortURL_ThrowNotFound.");
             }
             else
             {
@@ -142,13 +173,13 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Put_ShortURL_ReturnOk()
         {
-            ShortURL url = this.fixture.Create<ShortURL>();
+            var url = this.fixture.Create<Task<ShortURL>>();
 
-            this.shortURLRepoMock.Setup(repo => repo.Put(It.IsAny<ShortURL>())).Returns(url);
+            this.shortURLRepoMock.Setup(repo => repo.Put(It.IsAny<EditShortURLRequest>())).Returns(url);
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Put(url);
+            var result = await controller.Put(It.IsAny<EditShortURLRequest>());
             var obj = result as ObjectResult;
 
             if (obj is null)
@@ -162,22 +193,46 @@ namespace URL_Shortening.Backend.Tests
         }
 
         /// <summary>
-        /// Tests whether Put returns 404 Not Found when it is unsuccessful.
+        /// Tests whether Put returns 400 Bad Request when it is unsuccessful.
         /// </summary>
         /// <returns>A <see cref="Task"/>representing the result of the asynchronous operation.</returns>
         [Test]
         public async Task Put_ShortURL_ThrowException()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Put(It.IsAny<ShortURL>())).Throws(new Exception());
+            this.shortURLRepoMock.Setup(repo => repo.Put(It.IsAny<EditShortURLRequest>())).Throws(new Exception());
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Put(It.IsAny<ShortURL>());
+            var result = await controller.Put(It.IsAny<EditShortURLRequest>());
             var obj = result as ObjectResult;
 
             if (obj is null)
             {
                 Assert.Fail("obj was null in Put_ShortURL_ThrowException.");
+            }
+            else
+            {
+                Assert.That(obj.StatusCode, Is.EqualTo(400));
+            }
+        }
+
+        /// <summary>
+        /// Tests whether Put returns 404 Not Found when it is unsuccessful.
+        /// </summary>
+        /// <returns>A <see cref="Task"/>representing the result of the asynchronous operation.</returns>
+        [Test]
+        public async Task Put_ShortURL_ThrowNotFound()
+        {
+            this.shortURLRepoMock.Setup(repo => repo.Put(It.IsAny<EditShortURLRequest>())).Throws(new NotFoundException("Test Message"));
+
+            ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
+
+            var result = await controller.Put(It.IsAny<EditShortURLRequest>());
+            var obj = result as ObjectResult;
+
+            if (obj is null)
+            {
+                Assert.Fail("obj was null in Put_ShortURL_ThrowNotFound.");
             }
             else
             {
@@ -187,18 +242,18 @@ namespace URL_Shortening.Backend.Tests
 
         /****************************************************** DELETE TESTS ******************************************************/
 
-                /// <summary>
+        /// <summary>
         /// Tests whether Delete returns 204 No Content when it is successful.
         /// </summary>
         /// <returns>A <see cref="Task"/>representing the result of the asynchronous operation.</returns>
         [Test]
         public async Task Delete_ShortURL_ReturnOk()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Delete(It.IsAny<string>())).Returns(true);
+            this.shortURLRepoMock.Setup(repo => repo.Delete(It.IsAny<int>())).ReturnsAsync(true);
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Delete(It.IsAny<string>());
+            var result = await controller.Delete(It.IsAny<int>());
             var obj = result as ObjectResult;
 
             if (obj is null)
@@ -212,22 +267,46 @@ namespace URL_Shortening.Backend.Tests
         }
 
         /// <summary>
-        /// Tests whether Delete returns 404 Not Found when it is unsuccessful.
+        /// Tests whether Delete returns 400 Bad Request when unsuccessful.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Test]
         public async Task Delete_ShortURL_ThrowException()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new Exception());
+            this.shortURLRepoMock.Setup(repo => repo.Delete(It.IsAny<int>())).Throws(new Exception());
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
-            var result = await controller.Delete(It.IsAny<string>());
+            var result = await controller.Delete(It.IsAny<int>());
             var obj = result as ObjectResult;
 
             if (obj is null)
             {
                 Assert.Fail("obj was null in Delete_ShortURL_ThrowException.");
+            }
+            else
+            {
+                Assert.That(obj.StatusCode, Is.EqualTo(400));
+            }
+        }
+
+        /// <summary>
+        /// Tests whether Delete returns 404 Not Found when unsuccessful.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        [Test]
+        public async Task Delete_ShortURL_ThrowNotFound()
+        {
+            this.shortURLRepoMock.Setup(repo => repo.Delete(It.IsAny<int>())).Throws(new NotFoundException("Test Message"));
+
+            ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
+
+            var result = await controller.Delete(It.IsAny<int>());
+            var obj = result as ObjectResult;
+
+            if (obj is null)
+            {
+                Assert.Fail("obj was null in Delete_ShortURL_ThrowNotFound.");
             }
             else
             {
