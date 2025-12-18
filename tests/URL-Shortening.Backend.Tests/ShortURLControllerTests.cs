@@ -313,5 +313,57 @@ namespace URL_Shortening.Backend.Tests
                 Assert.That(obj.StatusCode, Is.EqualTo(404));
             }
         }
+
+        /****************************************************** REDIRECT TESTS ******************************************************/
+
+        /// <summary>
+        /// Tests whether RedirectToUrl returns 400 bad request when unsuccessful.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Test]
+        public async Task Redirect_ShortURL_ThrowException()
+        {
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new Exception());
+            string testShortCode = "abcdefghij";
+
+            ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
+
+            var result = await controller.RedirectToUrl(testShortCode);
+            var obj = result as ObjectResult;
+
+            if (obj is null)
+            {
+                Assert.Fail("obj was null in Redirect_ShortURL_ThrowException.");
+            }
+            else
+            {
+                Assert.That(obj.StatusCode, Is.EqualTo(400));
+            }
+        }
+
+        /// <summary>
+        /// Tests whether RedirectToUrl returns 404 Not Found when unsuccessful.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Test]
+        public async Task Redirect_ShortURL_ThrowNotFound()
+        {
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new NotFoundException("Test Message"));
+            string testShortCode = "abcdefghij";
+
+            ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
+
+            var result = await controller.RedirectToUrl(testShortCode);
+            var obj = result as ObjectResult;
+
+            if (obj is null)
+            {
+                Assert.Fail("obj was null in Redirect_ShortURL_ThrowNotFound.");
+            }
+            else
+            {
+                Assert.That(obj.StatusCode, Is.EqualTo(404));
+            }
+        }
     }
 }

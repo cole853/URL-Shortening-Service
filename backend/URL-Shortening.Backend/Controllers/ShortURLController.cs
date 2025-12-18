@@ -5,11 +5,9 @@
 namespace URL_Shortening_Service.Backend.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using URL_Shortening_Service.Backend.Data;
     using URL_Shortening_Service.Backend.DTOs.Requests;
     using URL_Shortening_Service.Backend.Exceptions;
-    using URL_Shortening_Service.Backend.Models;
 
     /// <summary>
     /// Controller that contains the endpoints for the api.
@@ -139,6 +137,41 @@ namespace URL_Shortening_Service.Backend.Controllers
                 var result = await this.shortURLRepo.Delete(id);
 
                 return this.StatusCode(204, result);
+            }
+            catch (Exception ex)
+            {
+                if (ex is NotFoundException)
+                {
+                    return this.NotFound(ex.Message);
+                }
+                else
+                {
+                    return this.BadRequest(ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This endpoint redirects to the original url when given the short code.
+        /// </summary>
+        /// <param name="shortCode">The short code for the url that will be redirected to.</param>
+        /// <returns>status code.</returns>
+        [HttpGet("/{shortCode}")]
+        public async Task<IActionResult> RedirectToUrl(string shortCode)
+        {
+            try
+            {
+                bool ne = string.IsNullOrEmpty(shortCode);
+                bool lengthBad = shortCode.Length != 10;
+                bool structureBad = !System.Text.RegularExpressions.Regex.IsMatch(shortCode, "^[a-z0-9]+$");
+                if (ne || lengthBad || structureBad)
+                {
+                    return this.BadRequest("Short code is invalid");
+                }
+
+                var result = await this.shortURLRepo.Get(shortCode);
+
+                return this.RedirectPermanent(result.Url);
             }
             catch (Exception ex)
             {
