@@ -97,7 +97,7 @@ namespace URL_Shortening.Backend.Tests
             var url = this.fixture.Create<Task<ShortURL>>();
             string testShortCode = "abcdefghij";
 
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Returns(url);
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>(), false)).Returns(url);
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
@@ -121,7 +121,7 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Get_ShortURL_ThrowException()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new Exception());
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>(), false)).Throws(new Exception());
             string testShortCode = "abcdefghij";
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
@@ -146,7 +146,7 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Get_ShortURL_ThrowNotFound()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new NotFoundException("Test Message"));
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>(), false)).Throws(new NotFoundException("Test Message"));
             string testShortCode = "abcdefghij";
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
@@ -323,7 +323,7 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Redirect_ShortURL_ThrowException()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new Exception());
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>(), true)).Throws(new Exception());
             string testShortCode = "abcdefghij";
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
@@ -348,7 +348,7 @@ namespace URL_Shortening.Backend.Tests
         [Test]
         public async Task Redirect_ShortURL_ThrowNotFound()
         {
-            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>())).Throws(new NotFoundException("Test Message"));
+            this.shortURLRepoMock.Setup(repo => repo.Get(It.IsAny<string>(), true)).Throws(new NotFoundException("Test Message"));
             string testShortCode = "abcdefghij";
 
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);

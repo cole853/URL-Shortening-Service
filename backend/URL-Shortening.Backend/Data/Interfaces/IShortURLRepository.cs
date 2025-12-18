@@ -23,8 +23,9 @@ namespace URL_Shortening_Service.Backend.Data
         /// Gets the ShortURL with the given shortCode.
         /// </summary>
         /// <param name="shortCode">The shortCode for the ShortURL that will be returned.</param>
+        /// <param name="incrementAccess">Indicates whether the ShortURL accessCount should be incremented.</param>
         /// <returns>The ShortURL with the given shortCode.</returns>
-        Task<ShortURL> Get(string shortCode);
+        Task<ShortURL> Get(string shortCode, bool incrementAccess = false);
 
         /// <summary>
         /// Updates the given ShortURL.

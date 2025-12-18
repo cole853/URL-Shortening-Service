@@ -169,7 +169,7 @@ namespace URL_Shortening_Service.Backend.Controllers
                     return this.BadRequest("Short code is invalid");
                 }
 
-                var result = await this.shortURLRepo.Get(shortCode);
+                var result = await this.shortURLRepo.Get(shortCode, true);
 
                 return this.RedirectPermanent(result.Url);
             }

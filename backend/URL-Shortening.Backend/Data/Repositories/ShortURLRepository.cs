@@ -38,14 +38,21 @@ namespace URL_Shortening_Service.Backend.Data
         /// Gets the shortURL with the given shortCode.
         /// </summary>
         /// <param name="shortCode">The shortcode of the ShortURL that will be returned.</param>
+        /// <param name="incrementAccess">Indicates whether the ShortURL accessCount should be incremented.</param>
         /// <returns>The ShortURL with the given shortCode.</returns>
         /// <exception cref="NotFoundException">Thrown if the id was not found in the database.</exception>
-        public async Task<ShortURL> Get(string shortCode)
+        public async Task<ShortURL> Get(string shortCode, bool incrementAccess = false)
         {
             var tempShortURL = await this.context.ShortURLs.FirstOrDefaultAsync(x => x.ShortCode == shortCode);
             if (tempShortURL is null)
             {
                 throw new NotFoundException("The short code of the shorturl was not Found");
+            }
+
+            if (incrementAccess)
+            {
+                tempShortURL.IncrementAccessCount();
+                await this.context.SaveChangesAsync();
             }
 
             return tempShortURL;

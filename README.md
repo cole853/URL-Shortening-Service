@@ -5,4 +5,4 @@ remove containers with "docker compose rm"
 
 http api access outside containers: localhost:5000
 
-frontent access outside containers: localhost: 8080
+frontent access outside containers: localhost:8080
