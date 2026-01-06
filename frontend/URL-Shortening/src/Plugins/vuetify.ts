@@ -20,11 +20,6 @@ export default createVuetify({
     }
   },
   defaults: {
-    // VBtn: {
-    //   variant: 'default',
-    //   rounded: 'xl',
-    //   class: 'custom-btn',
-    // },
     VAppBar: {
         color: 'primary',
         class: 'custom-app-bar',
@@ -45,5 +40,3 @@ export default createVuetify({
     }
   }
 });
-
-// #a3a3a3ff

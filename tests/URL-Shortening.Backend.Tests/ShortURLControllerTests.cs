@@ -254,15 +254,15 @@ namespace URL_Shortening.Backend.Tests
             ShortURLController controller = new ShortURLController(this.shortURLRepoMock.Object);
 
             var result = await controller.Delete(It.IsAny<int>());
-            var obj = result as ObjectResult;
+            var noContentResult = result as NoContentResult;
 
-            if (obj is null)
+            if (noContentResult is null)
             {
-                Assert.Fail("obj was null in Delete_ShortURL_ReturnOk.");
+                Assert.Fail("Result was not a NoContentResult in Delete_ShortURL_ReturnOk.");
             }
             else
             {
-                Assert.That(obj.StatusCode, Is.EqualTo(204));
+                Assert.That(noContentResult.StatusCode, Is.EqualTo(204));
             }
         }
 

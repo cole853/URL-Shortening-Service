@@ -136,7 +136,7 @@ namespace URL_Shortening_Service.Backend.Controllers
             {
                 var result = await this.shortURLRepo.Delete(id);
 
-                return this.StatusCode(204, result);
+                return this.NoContent();
             }
             catch (Exception ex)
             {

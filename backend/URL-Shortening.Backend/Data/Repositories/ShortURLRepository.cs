@@ -46,7 +46,7 @@ namespace URL_Shortening_Service.Backend.Data
             var tempShortURL = await this.context.ShortURLs.FirstOrDefaultAsync(x => x.ShortCode == shortCode);
             if (tempShortURL is null)
             {
-                throw new NotFoundException("The short code of the shorturl was not Found");
+                throw new NotFoundException("The short code was not Found");
             }
 
             if (incrementAccess)
