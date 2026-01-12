@@ -24,7 +24,8 @@ namespace URL_Shortening_Service.Backend
             builder.Services.AddControllers();
 
             // Get connection string
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                                    ?? builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
             builder.Services.AddEndpointsApiExplorer();
